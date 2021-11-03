@@ -13,9 +13,9 @@ class Order:
 class Orderbook:
     def __init__(self, bids=[], asks=[]):
         self.bids = sortedcontainers.SortedList(
-            bids, key=lambda order: -order.price)  # buy orders
+            bids, key=lambda order: -order.price)  # sell orders
         self.asks = sortedcontainers.SortedList(
-            bids, key=lambda order: order.price)  # sell orders
+            bids, key=lambda order: order.price)  # buy orders
 
     def printBook(self):
         print("ORDER BOOK")
@@ -29,9 +29,9 @@ class Orderbook:
 
     def addOrder(self, order):
         if order.side == "B":
-            self.bids.add(order)
-        elif order.side == "S":
             self.asks.add(order)
+        elif order.side == "S":
+            self.bids.add(order)
 
     def removeOrder(self, orderId, quant):
         # find order with id then adjust quant
