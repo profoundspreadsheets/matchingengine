@@ -72,5 +72,20 @@ class Orderbook:
 
     def match(self):
         # check if spread passt
-        # sell order preis muss kleiner gleich sein als lowest ask
+        # sell order preis muss kleiner gleich sein als lowest bid
+        # buy order preis muss größer gleich sein als highest ask
+
+        # bids buy orders, guy who posted bid is ready to buy stock for limit price
+        # asks sell orders, guy who posted ask is ready to sell stock for limit price
+        # therefore bids are usually lower than asks
+        #
+        # wenn ein neues bid reinkommt, prüfen wir ob der limit preis dieses bids größer ist als
+        # der höchste ask. bid wird solange gefüllt bis der limit preis erreicht ist, dann kommt
+        # der rest ins orderbook
+        #
+        # gleichwohl wenn ein neuer ask reinkommt, prüfen wir ob dieser ask
+        # kleiner ist als der geringste bid
+        # ask wird solange gefüllt bis der limit preis erreicht ist, dann kommt der rest ins
+        # orderbook
+        #
         pass
