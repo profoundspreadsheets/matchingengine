@@ -20,8 +20,9 @@ def main():
 
             if len(inputArray) == 6:
                 # size is good, check if order can be added
-                orderBook.addOrder(Order("20210831", "A", "S", 10.4, 100))
-                pass
+                order = Order(inputArray[0], inputArray[2],
+                              inputArray[3], int(inputArray[4]), int(inputArray[5]))
+                orderBook.match(order)
             elif len(inputArray) == 4:
                 # size is good, check if order can be removed
                 pass
