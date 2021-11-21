@@ -1,4 +1,5 @@
 import sortedcontainers
+import itertools
 
 class Order:
     def __init__(self, time, orderId, side, price, quant):
@@ -25,6 +26,9 @@ class Orderbook:
         self.asks = sortedcontainers.SortedList(
             bids, key=lambda order: order.price)  # buy orders
 
+    def isEmpty(self):
+        return len(self.bids) == 0 and len(self.asks) == 0
+
     def printBook(self):
         print("ORDER BOOK")
         print("BIDS\nQuant Price")
@@ -34,6 +38,40 @@ class Orderbook:
         print("ASKS\nQuant Price")
         for ask in self.asks:
             print(str(ask.quant) + " " + str(ask.price))
+
+    def printTest(self):
+        print ("Limit Order Book".rjust(20))
+        print ("Bids" + "|Asks".rjust(14))
+        print("Quant Price  |Price   Quant")
+
+        order1 = Order("", "", "B", 13, 100)
+        order2 = Order("", "", "B", 12.78, 5)
+        order3 = Order("", "", "B", 12.76, 46)
+        order4 = Order("", "", "B", 10.86, 5760)
+        order5 = Order("", "", "S", 14.25, 50)
+        order6 = Order("", "", "S", 130.16, 1200)
+
+        listebids = [order1, order2, order3, order4]
+        listeasks = [order5, order6]
+        zipped = list(itertools.zip_longest(listebids, listeasks))
+        for paar in zipped:
+            bid = paar[0]
+            ask = paar[1]
+            priceBid = ""
+            quantBid = ""
+            priceAsk = ""
+            quantAsk = ""
+
+            if bid:
+                priceBid = format(bid.price, ".2f")
+                quantBid = bid.quant
+            if ask:
+                priceAsk = format(ask.price, ".2f")
+                quantAsk = ask.quant
+
+            print(str(quantBid).rjust(5) + str(priceBid).rjust(8) + "|" + str(priceAsk).rjust(7) + str(quantAsk).rjust(6))
+
+            
 
     def addOrder(self, order):
         if order.side == "B":

@@ -35,7 +35,8 @@ def main():
                 print("print out help here lmao")
             elif inputArray[0] == "printbook":
                 orderBook.printBook()
-                pass
+            elif inputArray[0] == "print":
+                orderBook.printTest()
             else:
                 print("unrecognized: {0}".format(inputArray))
         except KeyboardInterrupt:

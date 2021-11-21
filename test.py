@@ -3,6 +3,11 @@ from matchingengine import *
 
 
 class TestBook(unittest.TestCase):
+    
+    def testEmpty(self):
+        testBook = Orderbook()
+        self.assertTrue(testBook.isEmpty())
+    
     def testAskIsLowest(self):
         testBook = Orderbook()
         testBook.addOrder(Order("20210831", "A", "B", 11.4, 100))
