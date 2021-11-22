@@ -30,30 +30,11 @@ class Orderbook:
         return len(self.bids) == 0 and len(self.asks) == 0
 
     def printBook(self):
-        print("ORDER BOOK")
-        print("BIDS\nQuant Price")
-        for bid in self.bids:
-            print(str(bid.quant) + " " + str(bid.price))
-
-        print("ASKS\nQuant Price")
-        for ask in self.asks:
-            print(str(ask.quant) + " " + str(ask.price))
-
-    def printTest(self):
         print ("Limit Order Book".rjust(20))
         print ("Bids" + "|Asks".rjust(14))
         print("Quant Price  |Price   Quant")
 
-        order1 = Order("", "", "B", 13, 100)
-        order2 = Order("", "", "B", 12.78, 5)
-        order3 = Order("", "", "B", 12.76, 46)
-        order4 = Order("", "", "B", 10.86, 5760)
-        order5 = Order("", "", "S", 14.25, 50)
-        order6 = Order("", "", "S", 130.16, 1200)
-
-        listebids = [order1, order2, order3, order4]
-        listeasks = [order5, order6]
-        zipped = list(itertools.zip_longest(listebids, listeasks))
+        zipped = list(itertools.zip_longest(self.bids, self.asks))
         for paar in zipped:
             bid = paar[0]
             ask = paar[1]
@@ -70,9 +51,7 @@ class Orderbook:
                 quantAsk = ask.quant
 
             print(str(quantBid).rjust(5) + str(priceBid).rjust(8) + "|" + str(priceAsk).rjust(7) + str(quantAsk).rjust(6))
-
-            
-
+          
     def addOrder(self, order):
         if order.side == "B":
             self.bids.add(order)
@@ -170,14 +149,15 @@ class Orderbook:
                 if order.quant <= ask.quant:  # fill whole order
                     trade = Trade(ask.price, order.quant)  # new trade
                     self.removeOrder(ask.orderId, order.quant)  # remove ask
+                    print ("Trade at {} with quant: {}".format(trade.price, trade.quant))
                     break  # can already break as order will be filled completely
                 elif order.quant > ask.quant:  # fill order until ask, then adjust order quant
                     trade = Trade(ask.price, ask.quant)  # new trade
                     order.quant -= ask.quant  # adjust size of incoming bid, some will be filled but not all
-                    print(order.quant)
                     self.removeOrder(ask.orderId, ask.quant)
 
+                    print ("Trade at {} with quant: {}".format(trade.price, trade.quant))
+
             # rest order
-            self.addOrder(order)
 
         pass
