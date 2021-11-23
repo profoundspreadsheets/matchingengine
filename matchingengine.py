@@ -70,11 +70,11 @@ class Orderbook:
             if order.orderId == orderId:
                 index = liste.index(order)
                 if liste[index].quant == quant:
-                    print("removing order at index: {}".format(str(index)))
+                    #print("removing order at index: {}".format(str(index)))
                     liste.pop(index)
                     return True
                 elif liste[index].quant > quant:
-                    print("adjusting order at index: {}".format(str(index)))
+                    #print("adjusting order at index: {}".format(str(index)))
                     liste[index].quant -= quant
                     return True
                 else:
@@ -96,26 +96,8 @@ class Orderbook:
             return self.asks[0].price
 
     def match(self, order):
-        # check if spread passt
-        # sell order preis muss kleiner gleich sein als lowest bid
-        # buy order preis muss größer gleich sein als highest ask
-
-        # bids buy orders, guy who posted bid is ready to buy stock for limit price
-        # asks sell orders, guy who posted ask is ready to sell stock for limit price
-        # therefore bids are usually lower than asks
-        #
-        # wenn ein neues bid reinkommt, prüfen wir ob der limit preis dieses bids größer ist als
-        # der höchste ask. bid wird solange gefüllt bis der limit preis erreicht ist, dann kommt
-        # der rest ins orderbook
-        #
-        # gleichwohl wenn ein neuer ask reinkommt, prüfen wir ob dieser ask
-        # kleiner ist als der geringste bid
-        # ask wird solange gefüllt bis der limit preis erreicht ist, dann kommt der rest ins
-        # orderbook
-        #
-
-        # match bids
-        if order.side == "S" and order.price <= self.getHighestBid():
+        # match incoming asks
+        if order.side == "S" and order.price <= self.getHighestBid(): # spread crossed, start filling order
             for bid in self.bids:
                 if order.quant == 0:  # filled
                      break
@@ -125,17 +107,18 @@ class Orderbook:
                 if order.quant <= bid.quant:  # fill whole order
                     trade = Trade(order.price, order.quant)  # new trade, price is ask price
                     self.removeOrder(bid.orderId, order.quant)  # remove ask                        
-                    print ("Trade at {} with quant: {}".format(trade.price, trade.quant))
+                    print ("Trade at {} with quant: {}. Total amount: {}".format(trade.price, trade.quant, trade.price * trade.quant))
                     break  # can already break as order will be filled completely
                 elif order.quant > bid.quant:  # fill order until ask, then adjust order quant
                     trade = Trade(order.price, bid.quant)  # new trade
                     order.quant -= bid.quant  # adjust size of incoming bid, some will be filled but not all
                     self.removeOrder(bid.orderId, bid.quant)
-                    print ("Trade at {} with quant: {}".format(trade.price, trade.quant))
+                    print ("Trade at {} with quant: {}. Total amount: {}".format(trade.price, trade.quant, trade.price * trade.quant))
             if order.quant > 0:
                 self.addOrder(order)
 
-        elif order.side == "B" and order.price >= self.getLowestAsk():  # start filling order
+        # match incoming bids
+        elif order.side == "B" and order.price >= self.getLowestAsk():  # spread crossed, start filling order
             '''
             case1: bid und best ask ist gleiche größe:
                 führe aus zu ask
@@ -164,14 +147,14 @@ class Orderbook:
                     trade = Trade(ask.price, order.quant)  # new trade
                     self.removeOrder(ask.orderId, order.quant)  # remove ask
                     order.quant = 0
-                    print ("Trade at {} with quant: {}".format(trade.price, trade.quant))
+                    print ("Trade at {} with quant: {}. Total amount: {}".format(trade.price, trade.quant, trade.price * trade.quant))
                     break  # can already break as order will be filled completely
                 elif order.quant > ask.quant:  # fill order until ask, then adjust order quant
                     trade = Trade(ask.price, ask.quant)  # new trade
                     order.quant -= ask.quant  # adjust size of incoming bid, some will be filled but not all
                     self.removeOrder(ask.orderId, ask.quant) # remove ask
 
-                    print ("Trade at {} with quant: {}".format(trade.price, trade.quant))
+                    print ("Trade at {} with quant: {}. Total amount: {}".format(trade.price, trade.quant, trade.price * trade.quant))
             if order.quant > 0: #if there is some rest of the order unfilled
                 self.addOrder(order)
 

@@ -33,6 +33,20 @@ def main():
                 print("print out help here lmao")
             elif inputArray[0] == "printbook":
                 orderBook.printBook()
+            elif inputArray[0] == "read":
+                infile = open("mini.in", "r", encoding="utf-8")
+                for line in infile:
+                    #inputLine = sys.stdin.readline().rstrip()
+                    inputArray = line.split(" ")
+
+                    if len(inputArray) == 6 or len(inputArray) == 4:
+                        # size is good, check if order can be added
+                        if inputArray[1] == "A":
+                            order = Order(inputArray[0], inputArray[2],
+                                    inputArray[3], float(inputArray[4]), int(inputArray[5]))
+                            orderBook.match(order)
+                        if inputArray[1] == "R":
+                            orderBook.removeOrder(inputArray[2], int(inputArray[3]))
             else:
                 print("unrecognized: {0}".format(inputArray))
         except KeyboardInterrupt:
