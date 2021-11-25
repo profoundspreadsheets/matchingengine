@@ -33,8 +33,10 @@ def main():
                 print("print out help here lmao")
             elif inputArray[0] == "printbook":
                 orderBook.printBook()
+            elif inputArray[0] == "trades":
+                orderBook.printTrades()        
             elif inputArray[0] == "read":
-                infile = open("mini.in", "r", encoding="utf-8")
+                infile = open("matchTest.in", "r", encoding="utf-8")
                 for line in infile:
                     #inputLine = sys.stdin.readline().rstrip()
                     inputArray = line.split(" ")

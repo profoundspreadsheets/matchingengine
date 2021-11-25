@@ -11,9 +11,11 @@ class Order:
 
 
 class Trade:
-    def __init__(self, price, quant):
+    def __init__(self, price, quant, bidId, askId):
         self.price = price
         self.quant = quant
+        self.bidId = bidId
+        self.askId = askId
 
     def __str__(self):
         return "Trade: {} at {}".format(self.quant, self.price)
@@ -25,6 +27,7 @@ class Orderbook:
             bids, key=lambda order: -order.price)  # sell orders
         self.asks = sortedcontainers.SortedList(
             bids, key=lambda order: order.price)  # buy orders
+        self.trades = []
 
     def isEmpty(self):
         return len(self.bids) == 0 and len(self.asks) == 0
@@ -52,6 +55,11 @@ class Orderbook:
 
             print(str(quantBid).rjust(5) + str(priceBid).rjust(8) + "|" + str(priceAsk).rjust(7) + str(quantAsk).rjust(6))
           
+    def printTrades(self):
+        for trade in self.trades:
+            print("Matched AskId: {} with BidId: {} - {} at {}. Total amount: {}".format(trade.askId, trade.bidId, trade.quant, trade.price, trade.price * trade.quant))
+        
+
     def addOrder(self, order):
         if order.side == "B":
             self.bids.add(order)
@@ -63,7 +71,8 @@ class Orderbook:
         # if quant is zero, remove order completely
         if not self.removeOrder_(self.bids, orderId, quant):
             if not self.removeOrder_(self.asks, orderId, quant):
-                print("didn't delete nothing")
+
+                print("didn't delete nothing of order: {}".format(orderId))
 
     def removeOrder_(self, liste, orderId, quant):
         for order in liste:
@@ -105,15 +114,15 @@ class Orderbook:
                     break
                 # filling logic
                 if order.quant <= bid.quant:  # fill whole order
-                    trade = Trade(order.price, order.quant)  # new trade, price is ask price
+                    trade = Trade(order.price, order.quant, bid.orderId, order.orderId)  # new trade, price is ask price
+                    self.trades.append(trade)
                     self.removeOrder(bid.orderId, order.quant)  # remove ask                        
-                    print ("Trade at {} with quant: {}. Total amount: {}".format(trade.price, trade.quant, trade.price * trade.quant))
                     break  # can already break as order will be filled completely
                 elif order.quant > bid.quant:  # fill order until ask, then adjust order quant
-                    trade = Trade(order.price, bid.quant)  # new trade
+                    trade = Trade(order.price, bid.quant, bid.orderId, order.orderId)  # new trade
+                    self.trades.append(trade)
                     order.quant -= bid.quant  # adjust size of incoming bid, some will be filled but not all
                     self.removeOrder(bid.orderId, bid.quant)
-                    print ("Trade at {} with quant: {}. Total amount: {}".format(trade.price, trade.quant, trade.price * trade.quant))
             if order.quant > 0:
                 self.addOrder(order)
 
@@ -144,17 +153,16 @@ class Orderbook:
                     break
                 # filling logic
                 if order.quant <= ask.quant:  # fill whole order
-                    trade = Trade(ask.price, order.quant)  # new trade
+                    trade = Trade(ask.price, order.quant, order.orderId, ask.orderId)  # new trade
+                    self.trades.append(trade)
                     self.removeOrder(ask.orderId, order.quant)  # remove ask
                     order.quant = 0
-                    print ("Trade at {} with quant: {}. Total amount: {}".format(trade.price, trade.quant, trade.price * trade.quant))
                     break  # can already break as order will be filled completely
                 elif order.quant > ask.quant:  # fill order until ask, then adjust order quant
-                    trade = Trade(ask.price, ask.quant)  # new trade
+                    trade = Trade(ask.price, ask.quant, order.orderId, ask.orderId)  # new trade
+                    self.trades.append(trade)
                     order.quant -= ask.quant  # adjust size of incoming bid, some will be filled but not all
                     self.removeOrder(ask.orderId, ask.quant) # remove ask
-
-                    print ("Trade at {} with quant: {}. Total amount: {}".format(trade.price, trade.quant, trade.price * trade.quant))
             if order.quant > 0: #if there is some rest of the order unfilled
                 self.addOrder(order)
 
